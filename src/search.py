@@ -1,3 +1,16 @@
+import os
+from dotenv import load_dotenv
+
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_postgres import PGVector
+from langchain.prompts import PromptTemplate
+
+load_dotenv()
+
+for k in ("OPENAI_API_KEY", "DATABASE_URL", "PG_VECTOR_COLLECTION_NAME"):
+    if not os.getenv(k):
+        raise RuntimeError(f"Environment variable {k} is not set")
+
 PROMPT_TEMPLATE = """
 CONTEXTO:
 {contexto}
@@ -25,5 +38,31 @@ PERGUNTA DO USUÁRIO:
 RESPONDA A "PERGUNTA DO USUÁRIO"
 """
 
+
 def search_prompt(question=None):
-    pass
+    embeddings = OpenAIEmbeddings(
+        model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+    )
+
+    store = PGVector(
+        embeddings=embeddings,
+        collection_name=os.getenv("PG_VECTOR_COLLECTION_NAME"),
+        connection=os.getenv("DATABASE_URL"),
+        use_jsonb=True,
+    )
+
+    context = store.similarity_search(question, k=10)
+
+    llm = ChatOpenAI(model="gpt-5-nano", temperature=0.6)
+    prompt = PromptTemplate(
+        input_variables=["contexto", "pergunta"],
+        template=PROMPT_TEMPLATE,
+    )
+
+    chain = prompt | llm
+
+    result = chain.invoke({"contexto": context, "pergunta": question})
+
+    print("Resposta gerada:\n")
+    print(result.content.strip())
+    print("-" * 50)
