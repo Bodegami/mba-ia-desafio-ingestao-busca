@@ -16,8 +16,6 @@ for k in ("OPENAI_API_KEY", "DATABASE_URL", "PG_VECTOR_COLLECTION_NAME", "PDF_PA
 
 PDF_PATH = os.getenv("PDF_PATH", "document.pdf")
 
-pdf = os.getenv("PDF_PATH", "document.pdf")
-
 
 def ingest_pdf():
     current_dir = Path(__file__).parent
