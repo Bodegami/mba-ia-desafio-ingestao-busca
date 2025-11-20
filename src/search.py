@@ -62,7 +62,4 @@ def search_prompt(question=None):
     chain = prompt | llm
 
     result = chain.invoke({"contexto": context, "pergunta": question})
-
-    print("Resposta gerada:\n")
-    print(result.content.strip())
-    print("-" * 50)
+    return result.content.strip()

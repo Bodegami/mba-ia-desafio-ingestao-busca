@@ -70,6 +70,12 @@ python src/ingest.py
 python src/chat.py
 ```
 
+4. Digite a sua pergunta ou 'exit' para sair:
+
+```powershell
+Qual o faturamento da SuperTechIABrazil?
+```
+
 ## Observações
 
 - Os comandos acima assumem que o `docker` está acessível e que o `docker compose` do seu sistema está configurado.
